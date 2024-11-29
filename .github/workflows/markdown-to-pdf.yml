@@ -1,27 +1,26 @@
 name: Convert Markdown to PDF
 
 on:
-  workflow_dispatch: # 手動実行を可能にするトリガー
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: リポジトリをチェックアウト
+    - name: チェックアウトリポジトリ
       uses: actions/checkout@v3
 
-    - name: Dockerコンテナで日本語PDFを生成
+    - name: DockerコンテナでPDFを生成
       uses: addnab/docker-run-action@v3
       with:
         image: paperist/alpine-texlive-ja:latest
-        options: --rm
+        options: -v ${{ github.workspace }}:/workspace -w /workspace
         run: |
-          # pandocをインストール
           apk add --no-cache pandoc
-          # Markdownファイルが存在することを確認
-          if [ ! -f sample.md ]; then echo "Error: sample.md not found"; exit 1; fi
-          # PDFを生成
+          if [ ! -f sample.md ]; then
+            echo "Error: sample.md not found in container"; exit 1
+          fi
           pandoc sample.md -o output.pdf --pdf-engine=lualatex
 
     - name: PDFをアップロード
