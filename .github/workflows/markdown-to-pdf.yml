@@ -1,9 +1,7 @@
 name: Convert Markdown to PDF and Create Release
 
 on:
-  push:
-    tags:
-      - "v*"  # バージョンタグがプッシュされたときに実行
+  workflow_dispatch:  # 手動実行を有効にする
 
 jobs:
   convert_and_release:
