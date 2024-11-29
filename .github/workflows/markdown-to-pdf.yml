@@ -19,6 +19,7 @@ jobs:
           # sample.mdの最初の行をタイトルとして抽出
           TITLE=$(head -n 1 sample.md | sed 's/^# //')
           echo "TITLE=$TITLE" >> $GITHUB_ENV  # GitHub Actionsの環境変数に設定
+          echo "Extracted title: $TITLE"  # ログにタイトルを出力して確認
 
       - name: Convert sample.md to sample.tex using template
         run: |
