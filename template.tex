@@ -1,31 +1,5 @@
-\documentclass[12pt, unicode, a4paper]{ltjsreport}
-
-\usepackage[top=25truemm, bottom=25truemm, left=20truemm, right=20truemm]{geometry}
-\usepackage[unicode, hidelinks, bookmarksnumbered, pdfusetitle]{hyperref}
-\usepackage{chngcntr}
-\usepackage{tocloft}
-
-\counterwithout{section}{chapter}
-\renewcommand{\thesection}{第\arabic{section}条}
-
-\cftsetindents{chapter}{0truemm}{20truemm}
-\cftsetindents{section}{5truemm}{20truemm}
-
-\title{\textbf{\Huge {{ title }} }}
-\author{{ author }}
-\date{{ date }}
-
+\documentclass{article}
+\usepackage[utf8]{inputenc}
 \begin{document}
-
-\maketitle
-
-\begin{abstract}
-{{ abstract }}
-\end{abstract}
-
-\tableofcontents
-\newpage
-
-{{ content }}
-
+$body$
 \end{document}

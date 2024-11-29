@@ -20,6 +20,7 @@ jobs:
         run: |
           apk add --no-cache pandoc
           pandoc sample.md -o sample.tex --template=template.tex
+          cat sample.tex  # 生成されたTeXファイルの内容を確認
 
     # TeX → PDF
     - name: TeXをPDFに変換
@@ -29,6 +30,7 @@ jobs:
         options: -v ${{ github.workspace }}:/workspace -w /workspace
         run: |
           lualatex sample.tex
+          cat sample.pdf  # 生成されたPDFの内容を確認
 
     # PDFをアップロード
     - name: PDFをアップロード
