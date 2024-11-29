@@ -45,10 +45,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: "release-$(date +'%Y%m%d%H%M%S')"
+          release_name: "Release $(date +'%Y-%m-%d %H:%M:%S')"
           body: |
-            Compiled PDF ${{ github.ref_name }}
+            Compiled PDF
           draft: false
           prerelease: false
 
