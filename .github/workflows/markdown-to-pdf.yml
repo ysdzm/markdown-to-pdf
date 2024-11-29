@@ -11,7 +11,7 @@ jobs:
     - name: チェックアウトリポジトリ
       uses: actions/checkout@v3
 
-    # Step 1: Markdown → TeX
+    # Markdown → TeX
     - name: MarkdownをTeXに変換
       uses: addnab/docker-run-action@v3
       with:
@@ -19,9 +19,9 @@ jobs:
         options: -v ${{ github.workspace }}:/workspace -w /workspace
         run: |
           apk add --no-cache pandoc
-          pandoc sample.md -o sample.tex
+          pandoc sample.md -o sample.tex --template=template.tex
 
-    # Step 2: TeX → PDF
+    # TeX → PDF
     - name: TeXをPDFに変換
       uses: addnab/docker-run-action@v3
       with:
