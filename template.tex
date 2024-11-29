@@ -4,9 +4,19 @@
 
 \def\tightlist{\itemsep1pt\parskip0pt\parsep0pt}  % ここで \tightlist を定義
 
-\title{C0de 部内規約}
-\date{令和6年（2024年）11月13日}
+% タイトル設定
+\title{{\Huge \textbf{コンピュータ倶楽部規約}}}
+
+% セクション設定（デフォルトの \section ではなく、指定された \section を使う）
+\renewcommand{\section}[1]{\vspace{10pt}\noindent \textbf{\large #1}}
+
+% サブセクション設定（pandoc によるデフォルトで \subsection を使用しない）
+\renewcommand{\subsection}[1]{\vspace{8pt}\noindent \textbf{#1}}
 
 \begin{document}
+
+\maketitle
+
 $body$
+
 \end{document}
