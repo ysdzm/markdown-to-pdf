@@ -19,6 +19,7 @@ jobs:
       - name: Display sample.tex content
         run: cat sample.tex
 
-      - name: Run LaTeX with XeLaTeX (paperist/alpine-texlive-ja)
+      - name: Run LaTeX with pLaTeX and dvipdfmx
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja xelatex /workdir/sample.tex
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
