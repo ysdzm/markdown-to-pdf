@@ -1,0 +1,27 @@
+name: Convert Markdown to PDF
+
+on:
+  workflow_dispatch: # 手動実行を可能にするトリガー
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: チェックアウトリポジトリ
+      uses: actions/checkout@v3
+
+    - name: 必要なパッケージをインストール
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc texlive-latex-recommended texlive-xetex texlive-fonts-recommended
+
+    - name: MarkdownをPDFに変換
+      run: |
+        pandoc sample.md -o output.pdf --pdf-engine=xelatex
+
+    - name: PDFをアップロード
+      uses: actions/upload-artifact@v3
+      with:
+        name: converted-pdf
+        path: output.pdf
