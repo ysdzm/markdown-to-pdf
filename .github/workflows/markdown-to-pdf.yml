@@ -33,15 +33,10 @@ jobs:
       - name: Display sample.tex content
         run: cat sample.tex
 
-      # LaTeXファイルをDVI形式にコンパイル
-      - name: Compile sample.tex to DVI using platex
+      # LuaLaTeXでPDFを生成
+      - name: Compile LaTeX to PDF using LuaLaTeX
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
-
-      # DVIからPDFを生成
-      - name: Generate PDF from DVI using dvipdfmx
-        run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja lualatex -output-directory=/workdir /workdir/sample.tex
 
       # Releaseの作成
       - name: Create Release
