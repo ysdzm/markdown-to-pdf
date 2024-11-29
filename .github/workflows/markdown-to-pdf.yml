@@ -42,19 +42,20 @@ jobs:
         run: |
           # GitHubリリースの作成
           RELEASE_TAG="v1.0.0"  # バージョンタグを指定
+          RELEASE_NAME="Release $RELEASE_TAG"  # リリース名
           RESPONSE=$(curl -s -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d @- <<EOF
           {
             "tag_name": "$RELEASE_TAG",
-            "name": "$RELEASE_TAG",
+            "name": "$RELEASE_NAME",
             "body": "This release contains the generated PDF.",
             "draft": false,
             "prerelease": false
           }
           EOF
           )
-
+          
           # リリースIDを取得
           RELEASE_ID=$(echo "$RESPONSE" | jq -r .id)
 
