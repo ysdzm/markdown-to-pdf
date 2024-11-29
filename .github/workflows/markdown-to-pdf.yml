@@ -13,13 +13,9 @@ jobs:
       - name: Install pandoc
         run: sudo apt-get install pandoc
 
-      - name: Convert sample.md to sample.tex
-        run: pandoc -r markdown-auto_identifiers sample.md -o sample.tex
+      - name: Convert sample.md to sample.tex using template
+        run: |
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex
 
       - name: Display sample.tex content
         run: cat sample.tex
-
-      - name: Run LaTeX with pLaTeX and dvipdfmx
-        run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
