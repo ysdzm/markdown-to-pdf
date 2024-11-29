@@ -22,12 +22,10 @@ jobs:
 
       - name: Compile sample.tex to DVI using platex
         run: |
-          # platex でコンパイル (日本語対応)
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
 
       - name: Generate PDF from DVI using dvipdfmx
         run: |
-          # dvipdfmx で PDF 生成
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
 
       - name: Upload PDF as artifact
