@@ -1,9 +1,7 @@
 name: Convert Markdown to LaTeX
 
 on:
-  push:
-    paths:
-      - 'sample.md'
+  workflow_dispatch:  # 手動実行を有効にする
 
 jobs:
   convert:
