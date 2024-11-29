@@ -42,9 +42,16 @@ jobs:
           name: generated-pdf
           path: sample.pdf
 
+      - name: Create a tag for release
+        run: |
+          TAG="v$(date +'%Y%m%d%H%M%S')"  # タグ名を生成（例: v20241129083000）
+          git tag $TAG
+          git push origin $TAG  # タグをリモートにプッシュ
+
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           files: sample.pdf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REF: refs/tags/${{ steps.create_tag.outputs.tag }}  # 作成したタグを指定
