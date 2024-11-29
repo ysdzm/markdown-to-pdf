@@ -17,6 +17,8 @@ jobs:
         image: paperist/alpine-texlive-ja:latest # 日本語対応のTeX環境
         options: --rm # 実行後にコンテナを削除
         run: |
+          # pandocをインストール
+          apk add --no-cache pandoc
           # MarkdownファイルをPDFに変換
           pandoc sample.md -o output.pdf --pdf-engine=lualatex
 
