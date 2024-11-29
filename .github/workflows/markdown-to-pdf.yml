@@ -11,14 +11,14 @@ jobs:
     - name: チェックアウトリポジトリ
       uses: actions/checkout@v3
 
-    - name: 必要なパッケージをインストール
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y pandoc texlive-latex-recommended texlive-xetex texlive-fonts-recommended
-
-    - name: MarkdownをPDFに変換
-      run: |
-        pandoc sample.md -o output.pdf --pdf-engine=xelatex
+    - name: Dockerコンテナで日本語PDFを生成
+      uses: addnab/docker-run-action@v3 # Dockerコンテナを使うためのAction
+      with:
+        image: paperist/alpine-texlive-ja:latest # 日本語対応のTeX環境
+        options: --rm # 実行後にコンテナを削除
+        run: |
+          # MarkdownファイルをPDFに変換
+          pandoc sample.md -o output.pdf --pdf-engine=lualatex
 
     - name: PDFをアップロード
       uses: actions/upload-artifact@v3
