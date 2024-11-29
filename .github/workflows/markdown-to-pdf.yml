@@ -15,7 +15,8 @@ jobs:
 
       - name: Convert sample.md to sample.tex using template
         run: |
-          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex --no-ligatures
+
 
       - name: Display sample.tex content
         run: cat sample.tex
