@@ -18,3 +18,7 @@ jobs:
 
       - name: Display sample.tex content
         run: cat sample.tex
+
+      - name: Run LaTeX with paperist/alpine-texlive-ja
+        run: |
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja pdflatex /workdir/sample.tex
