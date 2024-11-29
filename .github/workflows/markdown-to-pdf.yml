@@ -9,49 +9,33 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+        
       - name: Install pandoc
         run: sudo apt-get install pandoc
 
       - name: Extract title from Markdown
         id: extract_title
         run: |
+          # sample.mdの最初の行をタイトルとして抽出
           TITLE=$(head -n 1 sample.md | sed 's/^# //')
-          echo "TITLE=$TITLE" >> $GITHUB_ENV
-          echo "Extracted title: $TITLE"
-
+          echo "TITLE=$TITLE" >> $GITHUB_ENV  # GitHub Actionsの環境変数に設定
+          echo "Extracted title: $TITLE"  # ログにタイトルを出力して確認
       - name: Convert sample.md to sample.tex using template
         run: |
-          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex -V title="$TITLE" || { echo "Pandoc conversion failed!"; exit 1; }
-
-      - name: Display sample.tex content (first 100 lines)
-        run: |
-          head -n 100 sample.tex
+          # MarkdownからLaTeXに変換し、テンプレートを使ってPDFを作成
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex -V title="$TITLE"
+          
+      - name: Display sample.tex content
+        run: cat sample.tex
 
       - name: Compile sample.tex to DVI using platex
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex || { echo "Platex compilation failed!"; exit 1; }
-
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
       - name: Generate PDF from DVI using dvipdfmx
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi || { echo "Dvipdfmx conversion failed!"; exit 1; }
-
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
       - name: Upload PDF as artifact
         uses: actions/upload-artifact@v3
         with:
           name: generated-pdf
           path: sample.pdf
-
-      - name: Create a tag for release
-        run: |
-          TAG="v$(date +'%Y%m%d%H%M%S')"  # タグ名を生成（例: v20241129083000）
-          git tag $TAG
-          git push origin $TAG  # タグをリモートにプッシュ
-
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: sample.pdf
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REF: refs/tags/${{ steps.create_tag.outputs.tag }}  # 作成したタグを指定
