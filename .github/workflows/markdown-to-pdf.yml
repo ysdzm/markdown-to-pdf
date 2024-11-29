@@ -15,9 +15,9 @@ jobs:
     - name: MarkdownをTeXに変換
       uses: docker://pandoc/core:latest
       with:
-        args: sample.md -o sample.tex --template=template.tex
-        run: |
-          echo "\\def\\tightlist{\\itemsep1pt\\parskip0pt\\parsep0pt}" >> sample.tex
+        args: |
+          sample.md -o sample.tex --template=template.tex
+          && echo "\\providecommand{\\tightlist}{\\setlength{\\itemsep}{0pt}\\setlength{\\parskip}{0pt}}" >> sample.tex
 
     # TeX → PDF (paperist/alpine-texlive-jaを使用)
     - name: TeXをPDFに変換
