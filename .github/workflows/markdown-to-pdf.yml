@@ -16,7 +16,7 @@ jobs:
       uses: docker://pandoc/core:latest
       with:
         args: |
-          sample.md -o sample.tex --template=template.tex
+          sample.md -o sample.tex
           && echo "\\providecommand{\\tightlist}{\\setlength{\\itemsep}{0pt}\\setlength{\\parskip}{0pt}}" >> sample.tex
 
     # TeX → PDF (paperist/alpine-texlive-jaを使用)
