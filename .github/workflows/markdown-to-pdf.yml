@@ -14,7 +14,7 @@ jobs:
         run: sudo apt-get install pandoc
 
       - name: Convert sample.md to sample.tex
-        run: pandoc sample.md -o sample.tex
+        run: pandoc -r markdown-auto_identifiers sample.md -o sample.tex
 
       - name: Display sample.tex content
         run: cat sample.tex
