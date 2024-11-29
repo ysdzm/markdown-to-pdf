@@ -8,18 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: チェックアウトリポジトリ
+    - name: リポジトリをチェックアウト
       uses: actions/checkout@v3
 
     - name: Dockerコンテナで日本語PDFを生成
-      uses: addnab/docker-run-action@v3 # Dockerコンテナを使うためのAction
+      uses: addnab/docker-run-action@v3
       with:
-        image: paperist/alpine-texlive-ja:latest # 日本語対応のTeX環境
-        options: --rm # 実行後にコンテナを削除
+        image: paperist/alpine-texlive-ja:latest
+        options: --rm
         run: |
           # pandocをインストール
           apk add --no-cache pandoc
-          # MarkdownファイルをPDFに変換
+          # Markdownファイルが存在することを確認
+          if [ ! -f sample.md ]; then echo "Error: sample.md not found"; exit 1; fi
+          # PDFを生成
           pandoc sample.md -o output.pdf --pdf-engine=lualatex
 
     - name: PDFをアップロード
