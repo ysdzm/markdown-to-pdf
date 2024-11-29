@@ -13,10 +13,17 @@ jobs:
       - name: Install pandoc
         run: sudo apt-get install pandoc
 
+      - name: Extract title from Markdown
+        id: extract_title
+        run: |
+          # sample.mdの最初の行をタイトルとして抽出
+          TITLE=$(head -n 1 sample.md | sed 's/^# //')
+          echo "TITLE=$TITLE" >> $GITHUB_ENV  # GitHub Actionsの環境変数に設定
+
       - name: Convert sample.md to sample.tex using template
         run: |
           # MarkdownからLaTeXに変換し、テンプレートを使ってPDFを作成
-          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex --title="$TITLE"
           
       - name: Display sample.tex content
         run: cat sample.tex
