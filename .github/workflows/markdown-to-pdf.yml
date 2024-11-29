@@ -9,62 +9,42 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: Install pandoc
         run: sudo apt-get install pandoc
 
       - name: Extract title from Markdown
         id: extract_title
         run: |
-          # sample.mdの最初の行をタイトルとして抽出
           TITLE=$(head -n 1 sample.md | sed 's/^# //')
-          echo "TITLE=$TITLE" >> $GITHUB_ENV  # GitHub Actionsの環境変数に設定
-          echo "Extracted title: $TITLE"  # ログにタイトルを出力して確認
+          echo "TITLE=$TITLE" >> $GITHUB_ENV
+          echo "Extracted title: $TITLE"
 
       - name: Convert sample.md to sample.tex using template
         run: |
-          # MarkdownからLaTeXに変換し、テンプレートを使ってPDFを作成
-          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex -V title="$TITLE"
-          
-      - name: Display sample.tex content
-        run: cat sample.tex
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex -V title="$TITLE" || { echo "Pandoc conversion failed!"; exit 1; }
+
+      - name: Display sample.tex content (first 100 lines)
+        run: |
+          head -n 100 sample.tex
 
       - name: Compile sample.tex to DVI using platex
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex || { echo "Platex compilation failed!"; exit 1; }
 
       - name: Generate PDF from DVI using dvipdfmx
         run: |
-          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
+          docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi || { echo "Dvipdfmx conversion failed!"; exit 1; }
 
-      - name: Create GitHub release and upload PDF
-        id: create_release
-        run: |
-          # GitHubリリースの作成
-          RELEASE_TAG="v1.0.0"  # バージョンタグを指定
-          RELEASE_NAME="Release $RELEASE_TAG"  # リリース名
-          RESPONSE=$(curl -s -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d @- <<EOF
-          {
-            "tag_name": "$RELEASE_TAG",
-            "name": "$RELEASE_NAME",
-            "body": "This release contains the generated PDF.",
-            "draft": false,
-            "prerelease": false
-          }
-          EOF
-          )
-          
-          # リリースIDを取得
-          RELEASE_ID=$(echo "$RESPONSE" | jq -r .id)
+      - name: Upload PDF as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-pdf
+          path: sample.pdf
 
-          # PDFファイルをアップロード
-          curl -X POST https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=sample.pdf \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @sample.pdf
-
-      - name: Provide download link
-        run: |
-          echo "Download the PDF from: https://github.com/$GITHUB_REPOSITORY/releases/download/v1.0.0/sample.pdf"
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: sample.pdf
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
