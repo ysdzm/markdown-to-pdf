@@ -16,7 +16,7 @@ jobs:
       - name: Convert sample.md to sample.tex using template
         run: |
           # MarkdownからLaTeXに変換し、テンプレートを使ってPDFを作成
-          pandoc sample.md -o sample.tex --template=template.tex
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex
           
       - name: Display sample.tex content
         run: cat sample.tex
