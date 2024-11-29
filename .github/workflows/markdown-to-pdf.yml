@@ -37,8 +37,33 @@ jobs:
         run: |
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
 
-      - name: Upload PDF as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: generated-pdf
-          path: sample.pdf
+      - name: Create GitHub release and upload PDF
+        id: create_release
+        run: |
+          # GitHubリリースの作成
+          RELEASE_TAG="v1.0.0"  # バージョンタグを指定
+          RESPONSE=$(curl -s -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/releases \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d @- <<EOF
+          {
+            "tag_name": "$RELEASE_TAG",
+            "name": "$RELEASE_TAG",
+            "body": "This release contains the generated PDF.",
+            "draft": false,
+            "prerelease": false
+          }
+          EOF
+          )
+
+          # リリースIDを取得
+          RELEASE_ID=$(echo "$RESPONSE" | jq -r .id)
+
+          # PDFファイルをアップロード
+          curl -X POST https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=sample.pdf \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @sample.pdf
+
+      - name: Provide download link
+        run: |
+          echo "Download the PDF from: https://github.com/$GITHUB_REPOSITORY/releases/download/v1.0.0/sample.pdf"
