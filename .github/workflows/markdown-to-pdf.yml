@@ -15,16 +15,18 @@ jobs:
 
       - name: Convert sample.md to sample.tex using template
         run: |
-          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex --no-ligatures
-
+          pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex
 
       - name: Display sample.tex content
         run: cat sample.tex
 
-      - name: Compile sample.tex to PDF using LaTeX
+      - name: Compile sample.tex to DVI using platex
         run: |
           # platex でコンパイル (日本語対応)
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
+
+      - name: Generate PDF from DVI using dvipdfmx
+        run: |
           # dvipdfmx で PDF 生成
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
 
