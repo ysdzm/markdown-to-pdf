@@ -1,41 +1,72 @@
-name: Convert Markdown to LaTeX
+name: Convert Markdown to PDF and Create Release
 
 on:
-  workflow_dispatch:  # 手動実行を有効にする
+  push:
+    tags:
+      - "v*"  # バージョンタグがプッシュされたときに実行
 
 jobs:
-  convert:
+  convert_and_release:
     runs-on: ubuntu-latest
+
     steps:
+      # リポジトリをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
+      # pandocをインストール
       - name: Install pandoc
         run: sudo apt-get install pandoc
 
+      # Markdownファイルのタイトルを抽出
       - name: Extract title from Markdown
         id: extract_title
         run: |
-          # sample.mdの最初の行をタイトルとして抽出
           TITLE=$(head -n 1 sample.md | sed 's/^# //')
-          echo "TITLE=$TITLE" >> $GITHUB_ENV  # GitHub Actionsの環境変数に設定
-          echo "Extracted title: $TITLE"  # ログにタイトルを出力して確認
-      - name: Convert sample.md to sample.tex using template
+          echo "TITLE=$TITLE" >> $GITHUB_ENV
+          echo "Extracted title: $TITLE"
+
+      # MarkdownからLaTeXファイルに変換
+      - name: Convert Markdown to LaTeX
         run: |
-          # MarkdownからLaTeXに変換し、テンプレートを使ってPDFを作成
           pandoc -r markdown-auto_identifiers sample.md -o sample.tex --template=template.tex -V title="$TITLE"
-          
+
+      # 生成されたLaTeXファイルを表示
       - name: Display sample.tex content
         run: cat sample.tex
 
+      # LaTeXファイルをDVI形式にコンパイル
       - name: Compile sample.tex to DVI using platex
         run: |
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja platex /workdir/sample.tex
+
+      # DVIからPDFを生成
       - name: Generate PDF from DVI using dvipdfmx
         run: |
           docker run --rm -v $PWD:/workdir paperist/alpine-texlive-ja dvipdfmx /workdir/sample.dvi
-      - name: Upload PDF as artifact
-        uses: actions/upload-artifact@v3
+
+      # Releaseの作成
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: generated-pdf
-          path: sample.pdf
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Compiled PDF ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # 生成されたPDFをReleaseにアップロード
+      - name: Upload Release Asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./sample.pdf
+          asset_name: sample.pdf
+          asset_content_type: application/pdf
